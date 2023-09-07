@@ -1,21 +1,21 @@
 import os
 import pandas as pd
 
-transcription_file = "./data/trocr_results/NHMD_ft_large.txt"
-gt_file = './data/NHMD_LINES_100/data/gt_test.txt'
+transcription_file = "./NHMD_GT/gt_test.txt"
+gt_file = './NHMD_GT/gt_test.txt'
 output_folder = './data/trocr_results/large'
 
 def gen_numerated_mappings():
     mappings = []
-    with open(gt_file) as f:
+    with open(gt_file, encoding="utf-8") as f:
         lines = f.readlines()
         for line in lines:
             # print(line.split('\t')[0].split('.')[0]+".att.txt")
-            mappings.append(line.split('\t')[0].split('.')[0]+".att.txt")
+            mappings.append(line.split('\t')[0].split('.')[0]+".att.txt")        
     return mappings
 
 def extract_lines_to_files(mappings):
-    with open(transcription_file) as f:
+    with open(transcription_file, encoding="utf-8") as f:
         lines = f.readlines()
         start = True
         file = ''

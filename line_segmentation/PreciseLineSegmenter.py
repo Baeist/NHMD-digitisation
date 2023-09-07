@@ -10,6 +10,9 @@ from PIL import Image, ImageDraw
 from scipy.spatial import ConvexHull
 from line_segmentation.util import get_point_neighbors
 from skimage.color import rgb2gray
+import matplotlib.pyplot as plt
+import math
+from math import acos, degrees
 
 class PreciseLineSegmenter(LineSegmenter):
     def __init__(self, path):
@@ -80,13 +83,18 @@ class PreciseLineSegmenter(LineSegmenter):
             polygon_set.append(start_point)
             angle_rad += np.pi/2
             end_point = (int(p1 + np.cos(angle_rad) * int(max(height, pixels))), int(p0 - np.sin(angle_rad) * int(max(height, pixels))))
+            
             polygon_set.append(end_point)
         hull = ConvexHull(polygon_set)
         sorted_points = [tuple(polygon_set[i]) for i in hull.vertices]
         pilImage = Image.fromarray(img)
+        
         draw = ImageDraw.Draw(pilImage)
+        
         draw.polygon(sorted_points, fill=True)
         return np.array(pilImage)
+
+   
 
     def __separate_lines(self, baseline, minx, miny, bbox, height):
         """
@@ -120,6 +128,8 @@ class PreciseLineSegmenter(LineSegmenter):
         maxx = min(max(sorted_points[:,1])+5, img.shape[1]-1)
         miny = max(min(sorted_points[:,0])-5, 1)
         maxy = min(max(sorted_points[:,0])+5, img.shape[0]-1)
+        
+        
         return minx, miny, maxx, maxy, int(min_dist)
 
     def __merge_line_segments(self, img, baseline, segments):
@@ -158,15 +168,18 @@ class PreciseLineSegmenter(LineSegmenter):
         """
         other_classes = dilated.copy()
         other_classes[segmented_img] = False
-
+        
         mask = np.zeros_like(segmented_img, dtype=bool)
         mask_img = Image.fromarray(mask)
+        
         draw = ImageDraw.Draw(mask_img)
         points= [(s[1], s[0]) for s in sorted_points]
         draw.polygon(points, outline=True, width=2)
         mask_array = np.array(mask_img)
+        
         filled_image = binary_fill_holes(mask_array)
         filled_image[filled_image == other_classes] = False
+        
         return filled_image
 
     def __trace_contour(self, filtered_shape):
@@ -193,9 +206,35 @@ class PreciseLineSegmenter(LineSegmenter):
         mask_array = np.array(mask)
         masked_image = np.ones_like(bbox_img)*average_color
         masked_image[mask_array] = bbox_img[mask_array]
-        y1, y2, x1, x2 = (int(np.min(points[:,0])), int(np.max(points[:,0])), int(np.min(points[:,1])), int(np.max(points[:,1]))) 
+        y1, y2, x1, x2 = (int(np.min(points[:,0])), int(np.max(points[:,0])), int(np.min(points[:,1])), int(np.max(points[:,1])))
+        
         masked_image = masked_image[y1:y2, x1:x2]
         return masked_image, y1, y2, x1, x2
+
+    def rotate_segment(self, segment, boundaryBox):
+        xs, xl, xsy, xly = 0, 0, 0, 0
+        for coord in segment.keys():                
+            if xs > coord[1] or xs == 0:
+                xs = coord[1]
+                xsy = coord[0]                    
+            if xl < coord[1] or xl == 0:
+                xl = coord[1]
+                xly = coord[0]
+                 
+        xdis = xl - xs
+        ydis = xsy - xly
+        aside = ydis
+        if aside < 0:
+            aside = aside * (-1)
+                
+        hypo = math.sqrt((aside * aside + xdis * xdis))
+            
+        rotateAngle = math.degrees(math.acos((xdis * xdis + hypo * hypo - aside * aside)/(2.0 * xdis * hypo)))            
+        if ydis > 0:
+            rotateAngle = rotateAngle * (-1)
+        
+        boundaryBox = ndimage.rotate(boundaryBox, rotateAngle, reshape = True, mode=self.config["rotate_angle_mode"], cval=self.config["angle_fill_greyscale"])
+        return boundaryBox
 
     def segment_lines(self, img_path):
         """
@@ -205,39 +244,78 @@ class PreciseLineSegmenter(LineSegmenter):
         scale = self.config["downsize_scale"]
         orig = Image.open(img_path)
         width, height = orig.size
+
         if self.config["crop_ucph_border"]:
-            orig = orig.crop((0, 0, width-self.config["crop_ucph_border_size"], height))
-        new_size = (int(width * scale), int(height * scale))
+            orig = orig.crop((0, 0, width - self.config["crop_ucph_border_size"], height))
+            
+        nwidth, nheight = orig.size
+        
+        new_size = (int(nwidth * scale), int(nheight * scale))
         resized_img = orig.resize(new_size)
+    
         img = rgb2gray(np.array(resized_img))
+        
         clusters, N = self.bbuilder.run(img)
         segmentations = []
         polygons = []
         region_coords = []
+        sortedClusters = []
+        sortMarkers = []
         for i in range(len(clusters)):
             Si = clusters[i]
             minx, miny, maxx, maxy, min_region = self.__get_line_bbox(Si, img)
             label = img[miny:maxy, minx:maxx]
+            
+            sortMarkYX = 0, 0
+            
+            for coSets in Si.keys():
+                if sortMarkYX[0] > coSets[0] or sortMarkYX[0] == 0:
+                    sortMarkYX = coSets[0], coSets[1]
+            sortMarkers.append(sortMarkYX)
+
+            sortMarkers.sort()
+            impIndex = sortMarkers.index(sortMarkYX)
+            
             thresh = threshold_otsu(label)
             thresholded = label < thresh
             height = self.__get_line_height(Si, N, thresholded, min_region, minx, miny)
+            
             new_baseline = np.array(list(Si.keys()))
             new_baseline[:,1] -= minx 
             new_baseline[:,0] -= miny
             dilated, segments = self.__separate_lines(Si, minx, miny, thresholded, height)
             binary_image, polygon_points = self.__merge_line_segments(dilated, new_baseline, segments)
             filtered_shape = self.__remove_outliers(binary_image, dilated, polygon_points)
-            contour = self.__trace_contour(filtered_shape) - 5
+            contour = self.__trace_contour(filtered_shape) - self.config["contour_adjuster"]
+            # contour[:, 1] -= self.config["contour_adjuster"]
             bbox, y1, y2, x1, x2 = self.__generate_bbox(label, contour)
-            x1 = (x1+minx)/scale
-            x2 = (x2+minx)/scale
-            y1 = (y1+miny)/scale
+            x1 = (x1+minx)/scale 
+            x2 = (x2+minx)/scale 
+            y1 = (y1+miny)/scale 
             y2 = (y2+miny)/scale
-            segmentations.append(bbox)
-            polygons.append([[x1,y1], [x1,y2], [x2,y2], [x2,y1]])
+            
+            if self.config["use_rotation_angle"]:
+                bbox = self.rotate_segment(Si, bbox)
+
+            if self.config["use_border_padding"]:    
+                if self.config["border_padding_mode"] == "constant":
+                    bbox = np.pad(bbox, (self.config["generate_border_padding_size"], ), mode = "constant", constant_values=self.config["greyscale_for_border_padding"])
+                else:
+                    bbox = np.pad(bbox, (self.config["generate_border_padding_size"], ), mode = self.config["border_padding_mode"])
+
+            segmentations.insert(impIndex, bbox)
+            # segmentations.append(bbox)
+             
+            polygons.insert(impIndex, [[x1,y1], [x1,y2], [x2,y2], [x2,y1]])
+            # polygons.append([[x1,y1], [x1,y2], [x2,y2], [x2,y1]])
             max_x = (max(contour[:,1]) + minx)/scale
             min_x = (min(contour[:,1]) + minx)/scale
             max_y = (max(contour[:,0]) + miny)/scale
             min_y = (min(contour[:,0]) + miny)/scale
-            region_coords.append([min_x, max_x, min_y, max_y])
-        return segmentations, polygons, clusters, region_coords, scale
+            region_coords.insert(impIndex, [min_x, max_x, min_y, max_y])
+            # region_coords.append([min_x, max_x, min_y, max_y])
+            sortedClusters.insert(impIndex, Si)
+            
+        return segmentations, polygons, sortedClusters, region_coords, scale
+        
+

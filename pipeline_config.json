@@ -7,8 +7,16 @@
     "superpixel_confidence_thresh": 0.1,
     "min_textline_height": 10,
     "downsize_scale": 0.33,
-    "crop_ucph_border": false,
+    "crop_ucph_border": true,
     "crop_ucph_border_size": 545,
-    "neighbour_connectivity_ratio": 0.4,
-    "fixed_interline_dist": 100
+    "neighbour_connectivity_ratio": 0.1,
+    "fixed_interline_dist": 100,
+    "contour_adjuster": 5,
+    "use_border_padding": false,
+    "generate_border_padding_size": 5,
+    "border_padding_mode": "constant",
+    "greyscale_for_border_padding": 0.9,
+    "use_rotation_angle": false,
+    "rotate_angle_mode": "nearest",
+    "angle_fill_greyscale": 0.9
 }

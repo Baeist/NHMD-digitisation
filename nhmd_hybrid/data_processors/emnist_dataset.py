@@ -36,6 +36,7 @@ class EMNISTDataset(Dataset):
             img = tt.RandomAffine(degrees=10, translate=(0.2, 0.15), scale=(0.8, 1.1))(img)
             img = self.expand_img(img, 32, 40)
             img = tt.ToTensor()(img).numpy()
+            
             transformed_random_digits_images.append(img)
         random_digits_images = np.array(transformed_random_digits_images)
         random_digits_labels = self.emnist_dataset.targets[rand_indices]

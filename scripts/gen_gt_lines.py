@@ -1,9 +1,9 @@
 import os
 import pandas as pd
 
-folder_loc = "./data/NHMD_LINES_100/image"
-gt_xlsx = "./data/NHMD_LINES_100/info.xlsx"
-output_path = "./data/NHMD_LINES_100/gt_test.txt"
+folder_loc = "./NHMD_GT/image"
+gt_xlsx = "./NHMD_GT/info.xlsx"
+output_path = "./Data/GT.txt"
 
 def write_filenames():
     files = os.listdir(folder_loc)
@@ -18,7 +18,7 @@ def write_filenames():
 def write_transcriptions():
     dataframe1 = pd.read_excel(gt_xlsx)
     files = dataframe1['image']
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         for idx, filename in enumerate(files):
             lines = dataframe1.iloc[idx]['text'].split("\n")
             for i, line in enumerate(lines):

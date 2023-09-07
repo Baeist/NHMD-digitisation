@@ -46,6 +46,7 @@ class HBLineSegmenter(LineSegmenter):
         new_size = (int(width * scale), int(height * scale))
         resized_img = orig.resize(new_size)
         img = rgb2gray(np.array(resized_img))
+        print(img.size)
         clusters, N = self.bbuilder.run(img)
         segmentations = []
         region_coords = []

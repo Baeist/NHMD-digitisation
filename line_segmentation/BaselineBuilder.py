@@ -3,11 +3,13 @@ from scipy.spatial import Delaunay
 from skimage.morphology import skeletonize
 from line_segmentation.predictor.inference import Predictor
 from line_segmentation.util import get_point_neighbors
+import matplotlib.pyplot as plt
 
 class BaselineBuilder():
     def __init__(self, config):
         self.config = config
         self.predictor = Predictor(config)
+        
 
     def __select_superpixels(self, B, Bs):
         '''
@@ -36,13 +38,13 @@ class BaselineBuilder():
         for i in sorted_intensity_indexes:
             a = Bpixel_idx[i]
             if not len(superpixels):
-                superpixels.append(a)
-                superpixel_img[tuple(a)] = 255
+                superpixels.append(a)                
+                superpixel_img[tuple(a)]  = 255
             else:
                 dists = np.sqrt(((a - np.array(superpixels))**2).sum(axis=1)) 
                 if np.min(dists) >= 10:
-                    superpixels.append(a)
-                    superpixel_img[tuple(a)] = 255
+                    superpixels.append(a)                    
+                    superpixel_img[tuple(a)]  = 255        
         return superpixels, superpixel_img
 
     def __compute_connectivity(self, e, I):
@@ -116,8 +118,10 @@ class BaselineBuilder():
         ry = e[1][0]
         if qx > rx:
             angle = np.arctan2((-1)*(qy-ry), qx-rx)
+	    
         else:
             angle = np.arctan2((-1)*(qy-ry), rx-qx)
+        	    	
         return angle
 
     def __find_projections(self, p, points_within_circle, angle):
@@ -193,6 +197,7 @@ class BaselineBuilder():
         S0 = states.copy()
         P_star = [S0] 
         for p, v in states.items():
+            # print(p, v)
             NVs = get_point_neighbors(N, p)
             nv_connectivity = []
             p_state = {p: v}
@@ -245,6 +250,7 @@ class BaselineBuilder():
         return P_star
 
     def run(self, img):
+        
         B = self.predictor.run(img)
         Bb = (B > self.config['superpixel_confidence_thresh']) * 1
         Bs = skeletonize(Bb)
@@ -254,6 +260,9 @@ class BaselineBuilder():
         N = Delaunay(S)
         angles = [self.__extract_lto(p, N, B) for p in S]
         states = {tuple(p): (angles[i], self.__select_closest_interpdist_within_circle(p, angles[i], S)) for i, p in enumerate(S)}
+        
         clusters = self.__cluster_points(states, Bs, N)
+        
         print(f"{len(S)} superpixels extracted; {len(clusters)} line clusters generated")
         return clusters, N
+    

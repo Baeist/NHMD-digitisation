@@ -12,7 +12,6 @@ import numpy as np
 import time
 from tqdm import tqdm
 
-
 class LineSegmenterContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
     selector = providers.Selector(
@@ -31,7 +30,7 @@ class TranscriberContainer(containers.DeclarativeContainer):
     )
 
 class NHMDPipeline(object):
-    def __init__(self, config_path='./pipeline_config.json', save_images=False, out_dir='./out', out_type='txt'):
+    def __init__(self, config_path='./pipeline_config.json', save_images=False, out_dir='./out', out_type='txt', testing=False):
         os.makedirs(out_dir, exist_ok=True)
         if save_images:
             os.makedirs(os.path.join(out_dir, 'images'), exist_ok=True)
@@ -39,6 +38,7 @@ class NHMDPipeline(object):
         self.out_dir = out_dir
         self.out_type = out_type
         self.save_images = save_images
+        self.testing = testing
 
         lscontainer = LineSegmenterContainer()
         lscontainer.config.from_json(config_path)
@@ -47,6 +47,7 @@ class NHMDPipeline(object):
         tcontainer = TranscriberContainer()
         tcontainer.config.from_json(config_path)
         self.transcriber = tcontainer.selector(config_path)
+        
 
     def evaluate_baseline(self, path, out_dir='./out'):
         """
@@ -57,7 +58,7 @@ class NHMDPipeline(object):
         """
         _, _, clusters, _, _ = self.segmenter.segment_lines(path)
         baselines = ''
-        out_dir = './best_NHMD_cbad_preds'
+        #  out_dir = './best_NHMD_cbad_preds'
         if len(clusters) == 0:
             with open(os.path.join(out_dir, os.path.basename(path)[:-4] + '.txt'), 'w') as f:
                 pass
@@ -98,37 +99,57 @@ class NHMDPipeline(object):
         End-to-end transcription processor for a single image.
         Image will get segmented and transcribed.
         """
+       
         if id is None:
             print('Starting processing...')
             start = time.time()
+            
         lines, polygons, baselines, region_coords, scale = self.segmenter.segment_lines(path)
+        
         predictions = []
         for idx, line in enumerate(lines):
             text_line = f'{id}_line_{idx}.jpg' if id is not None else f'line_{idx}.jpg'
             if self.save_images:
-                img = Image.fromarray(line*255).convert('L')
+                img = Image.fromarray(line*255).convert('L')                
                 img.save(os.path.join(self.out_dir, 'images', text_line))
             pred = self.transcriber.transcribe(np.array(line*255))
+            if self.testing:
+                text_line = ""
+            
             predictions.append({'file':text_line, 'pred':pred})
 
         if self.out_type == 'txt':
             txt_predictions = [f'{pred["file"]}\t{pred["pred"]}\n'for pred in predictions]
-            with open(os.path.join(self.out_dir, f'{id}_result.txt'), 'w') as f:
-                f.write(''.join(txt_predictions))
-        elif self.out_type == 'xml':
+            if self.testing:
+                output_path = os.path.join('./scripts/data/results', id+'_result.txt')
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
+                # os.path.join('.scripts/data/results', f'{id}_result.txt')
+                with open(output_path, 'w', encoding="utf-8") as f:
+                    for l in txt_predictions:
+                        f.write(l.lstrip())
+            else:
+                with open(os.path.join(self.out_dir, f'{id}_result.txt'), 'w', encoding="utf-8") as f:
+                    for l in txt_predictions:
+                        f.write(l.lstrip())
+                    # f.write(''.join(txt_predictions))
+        elif self.out_type == 'xml':            
             filename = path.split('/')[-1]
             transcriptions = [d["pred"] for d in predictions]
+            
             generate_xml(filename, polygons, baselines,
                          region_coords, scale, transcriptions, self.out_dir)
+            
         if id is None:
             end = time.time()
             print(f"End of processing. Inference time: {int(end-start)} seconds")
+   
 
     def process_dir(self, path):
         """
         End-to-end transcription processor for a folder of images.
         Images will get segmented and transcribed.
         """
+                
         print('Starting processing...')
         start = time.time()
         for file in os.listdir(path):

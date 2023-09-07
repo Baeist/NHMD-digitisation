@@ -11,5 +11,9 @@ out
 out1
 wandb
 saved_models
-nhmd_out
+nhmd_out/
 EMNIST
+pictures/
+NHMD_GT/
+images
+nhmd_base_full_final

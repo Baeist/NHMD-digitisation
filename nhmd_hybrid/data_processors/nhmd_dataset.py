@@ -34,6 +34,7 @@ class NHMDDataset(Dataset):
         self.height = height
         self.augment = augment
         self.transform_medium, self.transform_heavy = self.__generate_transforms()
+        
 
     def __len__(self):
         return len(self.data)
@@ -65,7 +66,9 @@ class NHMDDataset(Dataset):
             img = self.expand_img(img, self.height, 40)
         image = np.array(img)
         img_transformed = transform(image=image)['image']
+        
         return img_transformed
+    
 
     def __getitem__(self, idx):
         element = self.data.iloc[idx]

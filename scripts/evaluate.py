@@ -1,37 +1,63 @@
 import torchmetrics
+from torchmetrics.text import CharErrorRate, WordErrorRate
 import argparse
 import os
 import math
 import numpy as np
 
-RESULTS_DIR = './data/single_line_results'
-GT_DIR = 'NHMD_GT'
+RESULTS_DIR = './data/results'
+GT_DIR = './data/GT'
 
-def get_scores(data_dir):
-    dir_loc = os.path.join(RESULTS_DIR, data_dir)
+def get_scores(dir_loc, lines):
+    # dir_loc = os.path.join(RESULTS_DIR, data_dir)
+    
     cers = []
     wers = []
     cer = torchmetrics.CharErrorRate()
     wer = torchmetrics.WordErrorRate()
+    n = 0
+    t = 0
     for file in os.listdir(dir_loc):
         file_path = os.path.join(dir_loc, file)
-        gt_path = os.path.join(RESULTS_DIR, GT_DIR, file)
-        with open(file_path) as r:
+        gt_path = os.path.join(GT_DIR, file)
+        t = t + 1
+        x, y = 0, 0
+        with open(file_path, "r", encoding="utf-8") as r:
             output = r.read()
-        with open(gt_path) as r:
+        with open(file_path, "r", encoding="utf-8") as r:
+            x = len(r.readlines())
+            
+        with open(gt_path, "r", encoding="utf-8") as r:
             gt_transcriptions = r.read()
-        c = np.clip(float(cer(output.lower(), gt_transcriptions.lower()).numpy()), 0.0, 1.0)
-        w = np.clip(float(wer(output.lower(), gt_transcriptions.lower()).numpy()), 0.0, 1.0)
+        with open(gt_path, "r", encoding="utf-8") as r:
+            y = len(r.readlines())
+            
+        if x == y and lines:
+            n = n + 1
+            c = np.clip(float(cer(output.lower(), gt_transcriptions.lower()).numpy()), 0.0, 1.0)
+            w = np.clip(float(wer(output.lower(), gt_transcriptions.lower()).numpy()), 0.0, 1.0)
         # Handling the case where no text was transcribed at all
-        if math.isnan(c) or math.isnan(w):
-            c = 1.0
-            w = 1.0
-        cers.append(c)
-        wers.append(w)
+            if math.isnan(c) or math.isnan(w):
+                c = 1.0
+                w = 1.0
+            cers.append(c)
+            wers.append(w)
+        elif not lines:
+            c = np.clip(float(cer(output.lower(), gt_transcriptions.lower()).numpy()), 0.0, 1.0)
+            w = np.clip(float(wer(output.lower(), gt_transcriptions.lower()).numpy()), 0.0, 1.0)
+            if math.isnan(c) or math.isnan(w):
+                c = 1.0
+                w = 1.0
+            cers.append(c)
+            wers.append(w)
     # Computing a mean per each paragraph to reduce overall error rate
     # caused by inaccurate layout analysis
     cer = np.array(cers).mean()
     wer = np.array(wers).mean()
+    if lines:
+        print(n, "/", t, "files were comparable")
+    elif not lines:
+        print(t, "files were compared")
     return cer, wer
 
 def gen_response(cer_bbox, wer_bbox, cer_orig, wer_orig):
@@ -68,7 +94,10 @@ def evaluate_model(args):
         # cer, wer = get_scores("../trocr_results/small_v2/single_line")
         # response += '===== TrOCR_SMALL - NHMD =====\n'
         # response += 'LINE CER: {}\nLINE WER: {}\n'.format(cer, wer)
-        cer, wer = get_scores("../trocr_results/large/single_line")
+        lines = False
+        if args.lines:
+            lines = True
+        cer, wer = get_scores("./data/results", lines)
         response += '===== TrOCR_LARGE - NHMD =====\n'
         response += 'LINE CER: {}\nLINE WER: {}\n'.format(cer, wer)
     
@@ -95,6 +124,7 @@ if __name__ == '__main__':
     parser.add_argument("--van", action=argparse.BooleanOptionalAction, help="Evaluate Vertical Attention Network model")
     parser.add_argument("--origaminet", action=argparse.BooleanOptionalAction, help="Evaluate OrigamiNet model")
     parser.add_argument("--all", action=argparse.BooleanOptionalAction, help="Evaluate all models")
+    parser.add_argument("--lines", action=argparse.BooleanOptionalAction, help="Switches to only comparable lines when evaluating")
     args = parser.parse_args()
     results = evaluate_model(args)
     print("Results:")

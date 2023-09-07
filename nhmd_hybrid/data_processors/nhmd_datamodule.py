@@ -6,6 +6,7 @@ import torch
 from torchvision.transforms import ToTensor
 from PIL import Image
 
+
 class MaxPoolImagePad:
     def __init__(self):
         self.pool = torch.nn.MaxPool1d(kernel_size=3, stride=2, padding=1)
@@ -37,7 +38,11 @@ class NHMDDataModule(pl.LightningDataModule):
     def expand_img(self, img, h, w):
         expanded = Image.new("L", (w, h), color=255)
         expanded.paste(Image.fromarray(img))
+        expanded = self.pad(expanded)
+
         return expanded
+    
+
 
     def collate_fn(self, batch):
         images = [b[0] for b in batch]
