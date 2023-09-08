@@ -118,7 +118,7 @@ class PreciseLineSegmenter(LineSegmenter):
         for p, (angle_rad, _) in Si.items():
             start_point = (p[0], p[1])
             # extend point in direction orthogonally bellow the baseline 
-            descender_point = (int(start_point[0] - np.sin(angle_rad-np.pi/2) * int(20)), int(start_point[1] + np.cos(angle_rad-np.pi/2) * int(20)))
+            descender_point = (int(start_point[0] - np.sin(angle_rad-np.pi/2) * int(self.config["descender_point_adjuster"])), int(start_point[1] + np.cos(angle_rad-np.pi/2) * int(self.config["descender_point_adjuster"])))
             polygon_set.append(descender_point)
             # extend point in direction orthogonally above the baseline
             ascender_point = (int(start_point[0] - np.sin(angle_rad+np.pi/2) * int(min_dist)), int(start_point[1] + np.cos(angle_rad+np.pi/2) * int(min_dist)))
@@ -186,7 +186,7 @@ class PreciseLineSegmenter(LineSegmenter):
         """
         Finds the contour on updated shape
         """
-        filtered_shape = np.pad(filtered_shape, (5,), mode='constant')
+        filtered_shape = np.pad(filtered_shape, (self.config["max_contour"],), mode='constant')
         contours = find_contours(filtered_shape)
 
         if len(contours) > 1:
@@ -204,7 +204,7 @@ class PreciseLineSegmenter(LineSegmenter):
         ImageDraw.Draw(mask).polygon(list(zip(points[:,1], points[:,0])), fill=1)
         average_color = np.mean(bbox_img, axis=(0, 1))
         mask_array = np.array(mask)
-        masked_image = np.ones_like(bbox_img)*average_color
+        masked_image = np.ones_like(bbox_img)*average_color        
         masked_image[mask_array] = bbox_img[mask_array]
         y1, y2, x1, x2 = (int(np.min(points[:,0])), int(np.max(points[:,0])), int(np.min(points[:,1])), int(np.max(points[:,1])))
         

@@ -121,7 +121,7 @@ class NHMDPipeline(object):
         if self.out_type == 'txt':
             txt_predictions = [f'{pred["file"]}\t{pred["pred"]}\n'for pred in predictions]
             if self.testing:
-                output_path = os.path.join('./scripts/data/results', id+'_result.txt')
+                output_path = os.path.join('./scripts/data/results', f'{id}_result.txt')
                 os.makedirs(os.path.dirname(output_path), exist_ok=True)
                 # os.path.join('.scripts/data/results', f'{id}_result.txt')
                 with open(output_path, 'w', encoding="utf-8") as f:
