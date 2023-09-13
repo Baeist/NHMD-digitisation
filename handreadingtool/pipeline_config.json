@@ -9,16 +9,17 @@
     "downsize_scale": 0.33,
     "crop_ucph_border": true,
     "crop_ucph_border_size": 545,
-    "neighbour_connectivity_ratio": 0.7,
+    "neighbour_connectivity_ratio": 0.5,
     "fixed_interline_dist": 100,
     "max_contour": 1,
-    "contour_adjuster": 0,
+    "contour_adjuster": 1,
     "descender_point_adjuster": 20,
     "use_border_padding": false,
     "generate_border_padding_size": 5,
     "border_padding_mode": "constant",
     "greyscale_for_border_padding": 0.9,
-    "use_rotation_angle": false,
+    "use_rotation_angle": true,
     "rotate_angle_mode": "nearest",
     "angle_fill_greyscale": 0.9
 }
+

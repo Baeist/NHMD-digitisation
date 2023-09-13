@@ -5,7 +5,7 @@ from line_segmentation.HBLineSegmenter import HBLineSegmenter
 from transcriber.wrappers.visionED_wrapper import VisionEncoderDecoderTranscriber
 from transcriber.wrappers.hybrid_wrapper import HybridTranscriber
 from transcriber.wrappers.vit_wrapper import VitTranscriber
-from xmlgenerator import generate_xml
+from handreadingtool.xmlgenerator import generate_xml
 import os
 from PIL import Image
 import numpy as np
@@ -66,8 +66,8 @@ class NHMDPipeline(object):
         for i in range(1, len(clusters)):
             Si = clusters[i]
             for p in Si.keys():
-                pointx = int(p[1] * (1/0.33))
-                pointy = int(p[0] * (1/0.33))
+                pointx = int(p[1] * (1/self.config["downsize_scale"]))
+                pointy = int(p[0] * (1/self.config["downsize_scale"]))
                 baselines += f'{pointx},{pointy};'
             baselines = baselines[:-1]
             baselines += '\n'
