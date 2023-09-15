@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import glob
 
-setup(name='handreadingtool',
+setup(name='htrocr',
       version='0.1',
       description='Package for reading handwritten documents.',
       classifiers=[
@@ -29,17 +29,17 @@ setup(name='handreadingtool',
         "scikit-image==0.19.3",
         "scikit-learn==1.2.2",
         "scipy==1.9.3",
-        "tensorflow==2.11.0",
+        "tensorflow==2.13.0",
         "timm==0.5.4",
-        "torch==1.13.1",
-        "torchaudio==0.13.1",
-        "torchmetrics==0.11.4",
-        "torchvision==0.14.1",
+        "torch",
+        "torchaudio",
+        "torchmetrics",
+        "torchvision",
         "tqdm",
         "transformers==4.26.0",
         "trdg==1.8.0",
         "wandb==0.14.0",
       ],
       include_package_data=True,
-      data_files=glob.glob("handreadingtool\pipeline_config.json")
+      data_files=glob.glob("htrocr\pipeline_config.json")
       )
