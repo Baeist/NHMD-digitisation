@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import glob
 
-setup(name='handreadingtool',
+setup(name='htrocr',
       version='0.1',
       description='Package for reading handwritten documents.',
       classifiers=[
@@ -41,5 +41,5 @@ setup(name='handreadingtool',
         "wandb==0.14.0",
       ],
       include_package_data=True,
-      data_files=glob.glob("handreadingtool\pipeline_config.json")
+      data_files=glob.glob("htrocr\pipeline_config.json")
       )
