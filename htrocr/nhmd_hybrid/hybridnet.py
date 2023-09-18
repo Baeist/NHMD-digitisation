@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 import pytorch_lightning as pl
-from nhmd_hybrid.utils.scheduler import CosineWarmupScheduler
+from htrocr.nhmd_hybrid.utils.scheduler import CosineWarmupScheduler
 from torch import optim
 import torch
 from torch import nn

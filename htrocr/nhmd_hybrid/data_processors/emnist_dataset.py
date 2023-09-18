@@ -1,4 +1,4 @@
-import utils.device as device
+import htrocr.nhmd_hybrid.utils.device as device
 from torchvision import datasets
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset

@@ -1,8 +1,8 @@
 import os
-from htrocr.collectiontransformers.EmunchTransformer import EmunchTransformer
-from htrocr.collectiontransformers.MMDTransformer import MMDTransformer
-from htrocr.collectiontransformers.RetroTransformer import RetroTransformer
-from htrocr.collectiontransformers.TranscribusTransformer import TranscribusTransformer
+from htrocr.database.collectiontransformers.EmunchTransformer import EmunchTransformer
+from htrocr.database.collectiontransformers.MMDTransformer import MMDTransformer
+from htrocr.database.collectiontransformers.RetroTransformer import RetroTransformer
+from htrocr.database.collectiontransformers.TranscribusTransformer import TranscribusTransformer
 import json
 import argparse
 import random

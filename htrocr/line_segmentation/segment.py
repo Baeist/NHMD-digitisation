@@ -1,9 +1,9 @@
 import fire
 import os
 from dependency_injector import containers, providers
-from htrocr.PreciseLineSegmenter import PreciseLineSegmenter
-from htrocr.HBLineSegmenter import HBLineSegmenter
-from htrocr.BaselineBuilder import BaselineBuilder
+from htrocr.line_segmentation.PreciseLineSegmenter import PreciseLineSegmenter
+from htrocr.line_segmentation.HBLineSegmenter import HBLineSegmenter
+from htrocr.line_segmentation.BaselineBuilder import BaselineBuilder
 from matplotlib import pyplot as plt
 from PIL import Image
 from skimage.color import rgb2gray

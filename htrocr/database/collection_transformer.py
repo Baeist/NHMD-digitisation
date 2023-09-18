@@ -3,7 +3,7 @@ import json
 import re
 from skimage.util import img_as_ubyte
 from skimage.io import imread, imsave
-from htrocr.line_processor import segment_lines
+from htrocr.database.line_processor import segment_lines
 
 
 def format_emunch_textline(line):

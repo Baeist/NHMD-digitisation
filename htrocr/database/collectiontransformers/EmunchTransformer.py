@@ -1,4 +1,4 @@
-from htrocr.collectiontransformers.CollectionTransformer import CollectionTransformer
+from htrocr.database.collectiontransformers.CollectionTransformer import CollectionTransformer
 import json
 import re
 

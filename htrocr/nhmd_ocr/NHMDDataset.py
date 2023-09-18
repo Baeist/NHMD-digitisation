@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
-from htrocr.TrOCREDProcessor import get_processor
+from htrocr.nhmd_ocr.TrOCREDProcessor import get_processor
 from transformers import TrOCRProcessor
 
 class NHMDDataset(Dataset):

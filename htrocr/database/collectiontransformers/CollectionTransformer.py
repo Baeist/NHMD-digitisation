@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import os
 from skimage.util import img_as_ubyte
 from skimage.io import imread, imsave
-from htrocr.line_processor import segment_lines
+from htrocr.database.line_processor import segment_lines
 import json
 import time
 

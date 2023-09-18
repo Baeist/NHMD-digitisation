@@ -1,4 +1,4 @@
-from htrocr.collectiontransformers.CollectionTransformer import CollectionTransformer
+from htrocr.database.collectiontransformers.CollectionTransformer import CollectionTransformer
 # from skimage.util import img_as_ubyte
 from skimage.io import imread, imsave
 from skimage.exposure import is_low_contrast

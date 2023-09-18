@@ -1,5 +1,5 @@
 from transformers import AutoConfig, AutoModelForCausalLM, AutoModel, VisionEncoderDecoderModel, VisionEncoderDecoderConfig
-from htrocr.TrOCREDProcessor import get_processor
+from htrocr.nhmd_ocr.TrOCREDProcessor import get_processor
 
 def fine_tune_model(encoder, decoder, base_arch, tokenizer_name):
     model = VisionEncoderDecoderModel.from_encoder_decoder_pretrained(encoder, decoder)

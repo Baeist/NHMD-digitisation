@@ -1,15 +1,15 @@
 import torch
-import htrocr.utils.device as device
+import htrocr.nhmd_hybrid.utils.device as device
 import os
 from tqdm import tqdm
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
-from htrocr.hybridnet import CNNTransformerHybrid
-import htrocr.utils.device as devutils
+from htrocr.nhmd_hybrid.hybridnet import CNNTransformerHybrid
+import htrocr.nhmd_hybrid.utils.device as devutils
 from itertools import groupby
-from htrocr.data_processors.nhmd_datamodule import NHMDDataModule
-from htrocr.nhmdtokenizer import NHMDTokenizer
+from htrocr.nhmd_hybrid.data_processors.nhmd_datamodule import NHMDDataModule
+from htrocr.nhmd_hybrid.nhmdtokenizer import NHMDTokenizer
 from transformers import RobertaTokenizer
 from torchmetrics import CharErrorRate, WordErrorRate
 import numpy as np

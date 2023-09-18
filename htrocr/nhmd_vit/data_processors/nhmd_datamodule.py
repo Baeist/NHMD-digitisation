@@ -1,6 +1,6 @@
-from .nhmd_dataset import NHMDDataset
+from htrocr.nhmd_vit.data_processors.nhmd_dataset import NHMDDataset
 import pytorch_lightning as pl
-import utils.device as device
+import htrocr.nhmd_vit.utils.device as device
 from torch.utils.data import DataLoader
 import torch
 from torchvision.transforms import ToTensor

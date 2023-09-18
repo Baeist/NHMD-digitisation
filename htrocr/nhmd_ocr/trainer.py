@@ -2,9 +2,9 @@ import fire
 import os
 import wandb
 from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments, default_data_collator, EarlyStoppingCallback
-from htrocr.NHMDDataset import NHMDDataset
-from htrocr.NHMDEncoderDecoder import generate_model, generate_model_full, fine_tune_model
-from htrocr.MetricProcessor import MetricProcessor
+from htrocr.nhmd_ocr.NHMDDataset import NHMDDataset
+from htrocr.nhmd_ocr.NHMDEncoderDecoder import generate_model, generate_model_full, fine_tune_model
+from htrocr.nhmd_ocr.MetricProcessor import MetricProcessor
 import json
 import time
 import torch
