@@ -2,6 +2,7 @@ Metadata-Version: 2.1
 Name: htrocr
 Version: 0.1
 Summary: Package for reading handwritten documents.
+Author: Linas Ein
 License: GNU
 Classifier: Development Status :: 3 - Alpha
 Classifier: License :: OSI Approved :: GNU Lesser General Public License

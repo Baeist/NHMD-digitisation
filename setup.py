@@ -4,6 +4,7 @@ import glob
 setup(name='htrocr',
       version='0.1',
       description='Package for reading handwritten documents.',
+      author="Linas Ein",
       classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: GNU Lesser General Public License',
@@ -41,7 +42,5 @@ setup(name='htrocr',
       ],
       packages=find_packages(),
       include_package_data=True,
-      data_files_json = glob.glob("pipeline_config.json"),
-      data_files_pb = glob.glob("line_segmentation\predictor\net\default.pb"),
       package_data={'htrocr': ['default.pb']},
       )

@@ -59,7 +59,66 @@ class NHMDPipeline(object):
         tcontainer = TranscriberContainer()
         tcontainer.config.from_json(config_path)
         self.transcriber = tcontainer.selector(config_path)
+    
+    def htrocr_usage(self, required_subject_path = None, transcription_model_weight_path = None,
+            save_images=False, out_dir='./out', out_type='txt', testing=False, segmenter = "precise", transcriber= "visioned", 
+            baseline_model_weight_path= "line_segmentation/predictor/net/default.pb",
+            transcription_img_processor = "microsoft/trocr-base-handwritten",
+            superpixel_confidence_thresh = 0.1, min_textline_height = 10,
+            downsize_scale = 0.33, crop_ucph_border = True, crop_ucph_border_size = 545,
+            neighbour_connectivity_ratio = 0.5, fixed_interline_dist = 100, max_contour = 5,
+            contour_adjuster = 5, descender_point_adjuster = 20, use_border_padding = False,
+            generate_border_padding_size = 5, border_padding_mode = "constant", greyscale_for_border_padding = 0.9,
+            use_rotation_angle = False, rotate_angle_mode = "nearest", angle_fill_greyscale = 0.9):
         
+        """
+        Full usage of pipeline. Includes configuration of the pipeline_config.json file and self.__init__. Mainly intended for package usage.
+        """
+        
+        path = os.path.dirname(__file__)
+        config_path = os.path.join(path, "pipeline_config.json")
+        
+        with open(config_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        data["segmenter"] = segmenter
+        data["transcriber"] = transcriber
+        data["baseline_model_weight_path"] = os.path.join(path, baseline_model_weight_path)
+        data["transcription_model_weight_path"] = transcription_model_weight_path
+        data["transcription_img_processor"] = transcription_img_processor
+        data["super_pixel_confidence_thresh"] = superpixel_confidence_thresh
+        data["min_textline_height"] = min_textline_height
+        data["downsize_scale"] = downsize_scale
+        data["crop_ucph_border"] = crop_ucph_border
+        data["crop_ucph_border_size"] = crop_ucph_border_size
+        data["neighbour_connectivity_ratio"] = neighbour_connectivity_ratio
+        data["fixed_interline_dist"] = fixed_interline_dist
+        data["max_contour"] = max_contour
+        data["contour_adjuster"] = contour_adjuster
+        data["descender_point_adjuster"] = descender_point_adjuster
+        data["use_border_padding"] = use_border_padding
+        data["generate_border_padding_size"] = generate_border_padding_size
+        data["border_padding_mode"] = border_padding_mode
+        data["greyscale_for_border_padding"] = greyscale_for_border_padding
+        data["use_rotation_angle"] = use_rotation_angle
+        data["rotate_angle_mode"] = rotate_angle_mode
+        data["angle_fill_greyscale"] = angle_fill_greyscale
+
+        with open(config_path, "w") as f:
+            json.dump(data, f)
+        
+        pipeline = NHMDPipeline(config_path, save_images, out_dir, out_type, testing)
+
+        if required_subject_path is None or transcription_model_weight_path is None:
+            print("Paths to image(s) and model are required. 'required_subject_path' and 'transcription_model_weight_path'")
+        else:    
+                if required_subject_path.endswith(".jpg") or required_subject_path.endswith(".png"):
+                    pipeline.process_image(required_subject_path)
+                else:
+                    pipeline.process_dir(required_subject_path)
+            
+
+
+
 
     def evaluate_baseline(self, path, out_dir='./out'):
         """
