@@ -40,6 +40,9 @@ class NHMDPipeline(object):
         self.save_images = save_images
         self.testing = testing
 
+        path = os.path.dirname(__file__)
+        config_path = f'{path}/pipeline_config.json'
+
         lscontainer = LineSegmenterContainer()
         lscontainer.config.from_json(config_path)
         self.segmenter = lscontainer.selector(config_path)

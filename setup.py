@@ -41,5 +41,6 @@ setup(name='htrocr',
         "wandb==0.14.0",
       ],
       include_package_data=True,
-      data_files=glob.glob("htrocr\pipeline_config.json")
+      data_files_json = glob.glob("htrocr\pipeline_config.json"),
+      data_files_pb = glob.glob("htrocr\line_segmentation\predictor\net\default.pb")
       )
