@@ -11,6 +11,8 @@ from PIL import Image
 import numpy as np
 import time
 from tqdm import tqdm
+import json
+import pkg_resources
 
 class LineSegmenterContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
@@ -41,7 +43,14 @@ class NHMDPipeline(object):
         self.testing = testing
 
         path = os.path.dirname(__file__)
-        config_path = f'{path}/pipeline_config.json'
+        config_path = os.path.join(path, "pipeline_config.json")
+        
+        with open(config_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        data["baseline_model_weight_path"] = os.path.join(path, 'line_segmentation/predictor/net/default.pb')
+
+        with open(config_path, "w") as f:
+            json.dump(data, f)
 
         lscontainer = LineSegmenterContainer()
         lscontainer.config.from_json(config_path)

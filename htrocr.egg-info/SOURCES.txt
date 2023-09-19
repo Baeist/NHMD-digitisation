@@ -40,6 +40,7 @@ htrocr/line_segmentation/util.py
 htrocr/line_segmentation/predictor/__init__.py
 htrocr/line_segmentation/predictor/inference.py
 htrocr/line_segmentation/predictor/net/__init__.py
+htrocr/line_segmentation/predictor/net/default.pb
 htrocr/nhmd_hybrid/__init__.py
 htrocr/nhmd_hybrid/backbone.py
 htrocr/nhmd_hybrid/encoder.py
