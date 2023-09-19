@@ -1,14 +1,13 @@
 from setuptools import setup, find_packages
-import glob
 
 setup(name='htrocr',
       version='0.1',
       description='Package for reading handwritten documents.',
-      author="Linas Ein",
+      author="Linas Einikis",
       classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: GNU Lesser General Public License',
-        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.9',
         'Topic :: Image Processing :: Linguistic',
       ],
       license='GNU',

@@ -82,7 +82,10 @@ class NHMDPipeline(object):
             data = json.load(f)
         data["segmenter"] = segmenter
         data["transcriber"] = transcriber
-        data["baseline_model_weight_path"] = os.path.join(path, baseline_model_weight_path)
+        if baseline_model_weight_path == "line_segmentation/predictor/net/default.pb":
+            data["baseline_model_weight_path"] = os.path.join(path, baseline_model_weight_path)
+        else:
+            data["baseline_model_weight_path"] = baseline_model_weight_path
         data["transcription_model_weight_path"] = transcription_model_weight_path
         data["transcription_img_processor"] = transcription_img_processor
         data["super_pixel_confidence_thresh"] = superpixel_confidence_thresh
