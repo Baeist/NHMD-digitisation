@@ -20,7 +20,7 @@ For more information go to https://github.com/NHMDenmark/HTROCR/blob/master/READ
 Image(s) needs to be either .jpg or .png. A trained model needs to be provided.
 In an environment with python:
 
-pip install git+https://github.com/Baeist/NHMD-digitisation.git@lworkspace#egg=htrocr
+pip install git+https://github.com/Baeist/NHMD-digitisation.git@package#egg=htrocr
 
 python
 
