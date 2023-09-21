@@ -26,9 +26,10 @@ python
 
 from htrocr.run import NHMDPipeline as pipe
 
-pipe.htrocr_usage(pipe, required_subject_path="path/to/image/or/directory", transcription_model_weight_path="path/to/trocr/model")
+pipe.htrocr_usage(pipe, required_subject_path="path/to/image/or/directory", transcription_model_weight_path="path/to/trocr/model/directory/path")
 
 Insert paths to images/model in the above. A new directory called "out" will be created, at the terminals location with the results in it.
+Please note that the crop_ucp_border is initially set to true, which crops the border found on ucp prepared documents.
 
 Full list of possible arguments for htrocr_usage including default values: 
             self, required_subject_path = None, transcription_model_weight_path = None,

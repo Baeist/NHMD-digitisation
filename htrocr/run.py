@@ -12,7 +12,6 @@ import numpy as np
 import time
 from tqdm import tqdm
 import json
-import pkg_resources
 
 class LineSegmenterContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
